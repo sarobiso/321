@@ -42,14 +42,24 @@ jobs:
                   <ul>
           EOF
 
-          # Find all PDFs in the root directory and add them as sidebar buttons
+          # Enable nullglob so the loop cleanly skips if zero PDFs exist
+          shopt -s nullglob
+          
           first_pdf=""
+          pdf_count=0
+
           for file in *.pdf; do
               if [ -f "$file" ]; then
+                  pdf_count=$((pdf_count+1))
                   if [ -z "$first_pdf" ]; then first_pdf="./$file"; fi
                   echo "<li><button onclick=\"changePDF('./$file')\">${file%.*}</button></li>" >> index.html
               fi
           done
+
+          # If no PDFs were found, add a placeholder message
+          if [ $pdf_count -eq 0 ]; then
+              echo "<li><span style='color:#aaa; padding:10px; display:block;'>No PDFs found yet</span></li>" >> index.html
+          fi
 
           cat << EOF >> index.html
                   </ul>
